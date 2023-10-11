@@ -50,6 +50,26 @@ prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStoma
     return nothing
 );
 
+prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStomatalModel{FT},swc::FT, β::FT, Δt::FT) where {FT<:AbstractFloat} = (
+    # unpack values
+    @unpack g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf = clayer;
+
+    # update g_sw
+    for iLF in 1:n_leaf
+        gsw_ss = max(0, stomatal_conductance(sm, clayer, envir,swc, β, iLF));
+        g_sw[iLF] += (gsw_ss - g_sw[iLF]) / clayer.τ_esm * Δt;
+
+        # update g_lw, gsc, and g_lc as well
+        g_lw[iLF] = 1 / ( 1/g_sw[iLF]  + 1/g_bw[iLF] );
+        g_sc[iLF] = g_sw[iLF] / FT(1.6);
+        g_lc[iLF] = 1 / ( 1/g_sc[iLF] + 1/g_m[iLF] + 1/g_bc[iLF] );
+    end;
+
+    return nothing
+);
+
+
+
 prognostic_gsw!(photo_set::AbstractPhotoModelParaSet{FT}, clayer::CanopyLayer{FT}, hs::LeafHydraulics{FT}, envir::AirLayer{FT}, sm::OSMWang{FT}, Δt::FT) where {FT<:AbstractFloat} = (
     # unpack values
     @unpack APAR, g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf = clayer;

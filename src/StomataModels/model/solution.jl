@@ -82,6 +82,44 @@ function solution_diff!(
     return g_lm - x
 end
 
+function solution_diff!(
+    x::FT,
+    photo_set::AbstractPhotoModelParaSet{FT},
+    canopyi::CanopyLayer{FT},
+    hs::LeafHydraulics{FT},
+    svc::AbstractSoilVC{FT},
+    psoil::FT,
+    swc::FT,
+    envir::AirLayer{FT},
+    sm::EmpiricalStomatalModel{FT},
+    bt::AbstractBetaG{FT},
+    mode::GlcDrive,
+    ind::Int
+) where {FT<:AbstractFloat}
+# unpack variables
+@unpack ps = canopyi;
+g_bc  = canopyi.g_bc[ind];
+g_m   = canopyi.g_m[ind];
+
+# update photosynthesis for ps
+leaf_photosynthesis!(photo_set, ps, envir, GCO₂Mode(), x);
+
+# calculate g_sw from stomatal model
+g_sc = 1 / (1/x - 1/g_bc - 1/g_m);
+g_sw = g_sc * FT(1.6);
+g_lw = 1 / (1/g_sw + FT(1.35)/g_bc);
+e    = g_lw * (canopyi.p_sat - envir.p_H₂O) / envir.p_atm;
+p    = end_pressure(hs, e);
+β    = β_factor(hs, svc, bt, p, psoil, swc);
+g_md = stomatal_conductance(sm, ps, envir,swc, β);
+g_md = min(canopyi.g_max, g_md);
+
+# calculate model predicted g_lc
+g_lm = 1 / (FT(1.6)/g_md + 1/g_bc + 1/g_m);
+
+return g_lm - x
+end
+
 
 
 
