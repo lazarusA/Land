@@ -67,6 +67,7 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     "Stomatal conductance to water H₂O `[mol m⁻² s⁻¹]`"
     g_sw::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.16)
 
+    g_sw0::Array{FT,1} = zeros(FT, n_leaf) .+ FT(0.16)
     # Diffusive conductances, same for all leaves
     "Gias correction constant"
     g_ias_c::FT = FT(0)
@@ -80,7 +81,8 @@ Base.@kwdef mutable struct CanopyLayer{FT<:AbstractFloat}
     g_min  ::FT = FT(0.001)
     "Minimal leaf diffusive conductance at 298.15 K `[mol m⁻² s⁻¹]`"
     g_min25::FT = FT(0.001)
-
+    
+    gsw_ss::FT = FT(0.001)
     # CO₂ and H₂O pressures, different for each leaf
     "Leaf internal CO₂ partial pressure `[Pa]`"
     p_i::Array{FT,1} = zeros(FT, n_leaf) .+ FT(10)

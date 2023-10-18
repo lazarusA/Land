@@ -34,13 +34,13 @@ function prognostic_gsw! end
 
 prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStomatalModel{FT}, β::FT, Δt::FT) where {FT<:AbstractFloat} = (
     # unpack values
-    @unpack g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf = clayer;
+    @unpack g_bc, g_bw, g_lc, g_lw, g_m, g_sc, g_sw, n_leaf, gsw_ss,g_sw0 = clayer;
 
     # update g_sw
     for iLF in 1:n_leaf
         gsw_ss = max(0, stomatal_conductance(sm, clayer, envir, β, iLF));
+        g_sw0[iLF]=g_sw[iLF]
         g_sw[iLF] += (gsw_ss - g_sw[iLF]) / clayer.τ_esm * Δt;
-
         # update g_lw, gsc, and g_lc as well
         g_lw[iLF] = 1 / ( 1/g_sw[iLF]  + 1/g_bw[iLF] );
         g_sc[iLF] = g_sw[iLF] / FT(1.6);
