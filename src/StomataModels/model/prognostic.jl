@@ -43,12 +43,16 @@ prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStoma
         g_sw[iLF] += (gsw_ss - g_sw[iLF]) / clayer.τ_esm * Δt;
         # update g_lw, gsc, and g_lc as well
         g_lw[iLF] = 1 / ( 1/g_sw[iLF]  + 1/g_bw[iLF] );
+        # println("prognostic g_lw")
+        # println(g_lw[iLF])
         g_sc[iLF] = g_sw[iLF] / FT(1.6);
         g_lc[iLF] = 1 / ( 1/g_sc[iLF] + 1/g_m[iLF] + 1/g_bc[iLF] );
     end;
 
     return nothing
 );
+
+
 
 prognostic_gsw!(clayer::CanopyLayer{FT}, envir::AirLayer{FT}, sm::EmpiricalStomatalModel{FT},swc::FT, β::FT, Δt::FT) where {FT<:AbstractFloat} = (
     # unpack values
