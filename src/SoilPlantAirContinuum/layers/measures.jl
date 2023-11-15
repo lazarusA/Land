@@ -67,7 +67,9 @@ function T_VEG_un(spac::SPACMono{FT}) where {FT<:AbstractFloat}
         _iPS = spac.plant_ps[_i_can];
         for iLF in 1:325
             _g_lw =_iPS.g_lw[iLF]
-            _t_veg = _g_lw * (_iPS.p_sat - _iEN.p_H₂O) / _iEN.p_atm * _iPS.LA; 
+            # println("LAI meas")
+            # println(_iPS.LAIx)
+            _t_veg = _g_lw .* (_iPS.p_sat - _iEN.p_H₂O) ./ _iEN.p_atm .* _iPS.LA; 
         end;  
          
     end;
@@ -101,7 +103,7 @@ function Canopy_cond(spac::SPACMono{FT}) where {FT<:AbstractFloat}
         _g_lw += numerical∫(_iPS.g_lw, _iPS.LAIx);
     end;
 
-    return  _g_lw / spac.ga
+    return  _g_lw #/ spac.ga
  
 end
 
@@ -132,6 +134,33 @@ function gsw_ss_out(spac::SPACMono{FT}) where {FT<:AbstractFloat}
 
     return  gsw_ss
  
+end
+
+function Rad_out(spac::SPACMono{FT}) where {FT<:AbstractFloat}
+    _Rad_out::FT = 0;
+
+    for _i_can in 1:spac.n_canopy
+        # @show _i_can;
+        _iPS = spac.plant_ps[_i_can];
+        _Rad_out += numerical∫(_iPS.Rn, _iPS.LAIx);
+    end;
+
+    return  _Rad_out
+ 
+end
+
+function Rad_out_un(spac::SPACMono{FT}) where {FT<:AbstractFloat}
+    _Rad_out::FT = 0.0;
+
+    for _i_can in 1:spac.n_canopy
+        _iPS = spac.plant_ps[_i_can];
+        for iLF in 1:325
+            _Rad_out =_iPS.Rn[iLF]
+        end;
+        #LAIx += numerical∫(_iPS.LAIx, _iPS.LAIx)
+    end;
+
+    return _Rad_out
 end
 
 
