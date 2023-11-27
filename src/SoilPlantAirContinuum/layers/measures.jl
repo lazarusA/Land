@@ -60,6 +60,16 @@ function ga_spac(spac::SPACMono{FT}) where {FT<:AbstractFloat}
 end
 
 
+function Rad_in(spac::SPACMono{FT}) where {FT<:AbstractFloat}
+    Rad::FT = 0.0;
+    
+    _iRAD = spac.in_rad
+    Rad = _iRAD.E_direct[1]
+
+    return Rad
+end
+
+
 
 function LAIx_out_un(spac::SPACMono{FT}) where {FT<:AbstractFloat}
     _LAIx::FT = 0.0;
