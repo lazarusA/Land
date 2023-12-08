@@ -469,3 +469,11 @@ function prescribe_swc!(spac::SPACMono{FT}, args...) where {FT<:AbstractFloat}
 
     return nothing
 end
+
+function prescribe_swc!(spac::SPACMono{FT}, SWC::FT) where {FT<:AbstractFloat}
+    for root in spac.plant_hs.roots
+        root.p_ups = SWC
+    end
+
+    return nothing
+end
